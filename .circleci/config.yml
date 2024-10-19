@@ -1,0 +1,88 @@
+version: 2.1
+
+refs:
+  - &release-channel
+    filters:
+      branches:
+        only:
+          - master
+          - alpha
+          - beta
+  - &branch
+    filters:
+      branches:
+        ignore:
+          - master
+          - alpha
+          - beta
+
+orbs:
+  node: circleci/node@5.2.0
+
+commands:
+  setup:
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: NPM Auth
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
+  build-package:
+    steps:
+      - run:
+          name: Build
+          command: yarn build
+
+  create-package-release:
+    description: Create release
+    steps:
+      - run:
+          command: yarn semantic-release
+          name: Release
+
+jobs:
+  build:
+    executor: node/default
+    steps:
+      - setup
+      - build-package
+      - run:
+          name: Test
+          command: yarn test
+
+  release_package:
+    executor: node/default
+    steps:
+      - setup
+      - build-package
+      - create-package-release
+
+workflows:
+  branches:
+    jobs:
+      - build:
+          <<: *branch
+          context:
+            - common-env-vars
+
+  release:
+    jobs:
+      - build:
+          <<: *release-channel
+          context:
+            - common-env-vars
+      - release-approval:
+          <<: *release-channel
+          type: approval
+          requires:
+            - build
+          context:
+            - common-env-vars
+      - release_package:
+          <<: *release-channel
+          requires:
+            - release-approval
+          context:
+            - common-env-vars

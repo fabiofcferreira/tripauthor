@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+
+    /* Language and Environment */
+    "target": "es2016",
+    "lib": ["es2016", "DOM"],
+    "jsx": "preserve",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleDetection": "auto",
+
+    /* Modules */
+    "module": "commonjs",
+    "resolveJsonModule": true,
+
+    /* JavaScript Support */
+    "allowJs": true,
+    "checkJs": true,
+
+    /* Emit */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "removeComments": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    "skipLibCheck": true
+  },
+  "include": ["./src"],
+  "exclude": ["./src/**/__tests__"]
+}
