@@ -1,5 +1,5 @@
 import { homedir } from "os";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
 export const USER_HOME_DIR = homedir();
 

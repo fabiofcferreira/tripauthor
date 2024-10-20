@@ -2,11 +2,11 @@
 
 import yargs from "yargs";
 import chalk from "chalk";
-import { loadGitKnownCoAuthors, USER_HOME_DIR } from "./config";
-import packageBundleJson from "../package.json";
 import { hideBin } from "yargs/helpers";
+import { loadGitKnownCoAuthors, USER_HOME_DIR } from "./config";
 import { getSelectedCoauthors } from "./prompts";
 import { isCommitOnGoing, updateCommitMessageWithCoAuthors } from "./commit";
+import packageBundleJson from "../package.json";
 
 yargs(hideBin(process.argv))
   .usage("Usage: $0 -f [commit message file]")

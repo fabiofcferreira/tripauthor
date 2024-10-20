@@ -1,5 +1,4 @@
-import { readFileSync } from "fs";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 export function isCommitOnGoing(filePath: string) {
   try {
@@ -10,18 +9,27 @@ export function isCommitOnGoing(filePath: string) {
   }
 }
 
+export function getCurrentCommitMessage(commitMessageFile: string) {
+  try {
+    return readFileSync(commitMessageFile, "utf8");
+  } catch (e) {
+    throw new Error(`Error reading current commit message: ${e}`);
+  }
+}
+
 export function updateCommitMessageWithCoAuthors(
   commitMessageFile: string,
   coAuthors: string[],
 ) {
   try {
-    const currentCommit = readFileSync(commitMessageFile, "utf8");
+    const currentCommitBody = getCurrentCommitMessage(commitMessageFile);
 
     const coAuthorsLines = coAuthors.map(
       (coauthor) => `Co-authored-by: ${coauthor}`,
     );
 
-    const newCommitPayload = currentCommit + "\n\n" + coAuthorsLines.join("\n");
+    const newCommitPayload =
+      currentCommitBody + "\n\n" + coAuthorsLines.join("\n");
     writeFileSync(commitMessageFile, newCommitPayload, "utf8");
   } catch (e) {
     throw new Error(
