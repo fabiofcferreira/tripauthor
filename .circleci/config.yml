@@ -17,14 +17,15 @@ refs:
           - beta
 
 orbs:
-  node: circleci/node@5.2.0
+  node: circleci/node@6.3.0
 
 commands:
   setup:
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: yarn
+      - node/install:
+          install-yarn: true
+          yarn-version: '4.5.1'
       - run:
           name: NPM Auth
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
