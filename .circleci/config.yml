@@ -34,6 +34,9 @@ commands:
 #            npm install -g yarn
 #            yarn set version stable
       - run:
+          name: Install dependencies
+          command: yarn install -y
+      - run:
           name: NPM Auth
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
 
