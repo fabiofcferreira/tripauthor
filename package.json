@@ -6,9 +6,7 @@
   "files": [
     "dist"
   ],
-  "bin": {
-    "tripauthor": "dist/index.js"
-  },
+  "bin": "dist/index.js",
   "repository": "git@github.com:fabiofcferreira/tripauthor.git",
   "author": "Fábio Ferreira <ffcfpten@gmail.com>",
   "license": "MIT",
@@ -25,8 +23,7 @@
   "dependencies": {
     "chalk": "4.1.2",
     "enquirer": "^2.4.1",
-    "yargs": "^17.7.2",
-    "zod": "^3.23.8"
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",

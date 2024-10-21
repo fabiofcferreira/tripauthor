@@ -7464,7 +7464,6 @@ __metadata:
     typescript: "npm:^5.5.4"
     typescript-eslint: "npm:^8.10.0"
     yargs: "npm:^17.7.2"
-    zod: "npm:^3.23.8"
   bin:
     tripauthor: dist/index.js
   languageName: unknown
@@ -7959,12 +7958,5 @@ __metadata:
   version: 2.1.1
   resolution: "yoctocolors@npm:2.1.1"
   checksum: 10c0/85903f7fa96f1c70badee94789fade709f9d83dab2ec92753d612d84fcea6d34c772337a9f8914c6bed2f5fc03a428ac5d893e76fab636da5f1236ab725486d0
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.23.8":
-  version: 3.23.8
-  resolution: "zod@npm:3.23.8"
-  checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
   languageName: node
   linkType: hard
