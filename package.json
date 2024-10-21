@@ -6,7 +6,9 @@
   "files": [
     "dist"
   ],
-  "bin": "dist/index.js",
+  "bin": {
+    "tripauthor": "dist/index.js"
+  },
   "repository": "git@github.com:fabiofcferreira/tripauthor.git",
   "author": "Fábio Ferreira <ffcfpten@gmail.com>",
   "license": "MIT",
