@@ -27,6 +27,9 @@ commands:
           install-yarn: true
           yarn-version: '4.5.1'
       - run:
+          name: Enable corepack
+          command: corepack enable
+      - run:
           name: NPM Auth
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
 
