@@ -23,14 +23,10 @@ commands:
   setup:
     steps:
       - checkout
-      - node/install:
-          install-yarn: true
+      - node/install
       - run:
-          name: "Disable Corepack's download prompt"
-          command: export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-      - run:
-          name: Enable corepack
-          command: corepack enable
+          name: "Install yarn"
+          command: export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && npm install -g yarn && corepack enable
       - run:
           name: Install dependencies
           command: yarn install
