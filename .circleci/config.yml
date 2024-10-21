@@ -24,6 +24,7 @@ commands:
     steps:
       - checkout
       - node/install:
+          install-yarn: true
       - run:
           name: Yarn Set Version Stable
           command: |
