@@ -1,37 +1,55 @@
+import {
+  getCurrentCommitMessage,
+  isCommitOnGoing,
+  updateCommitMessageWithCoAuthors,
+} from "../commit";
 import * as fs from "node:fs";
-import * as commit from "../commit";
+
+const DEFAULT_COMMIT_MESSAGE_FILE = "./.git/COMMIT_EDITMSG";
+const DEFAULT_COMMIT_TITLE = "feat: default commit message";
 
 jest.mock("node:fs", () => ({
   ...jest.requireActual("node:fs"),
-  readFileSync: jest.fn(() => "feat: default commit message"),
+  readFileSync: jest.fn().mockImplementation(() => DEFAULT_COMMIT_TITLE),
   writeFileSync: jest.fn(),
-}));
-
-jest.mock("../commit", () => ({
-  ...jest.requireActual("../commit"),
-  getCurrentCommitMessage: jest.fn(),
 }));
 
 describe("Commit logic", () => {
   it("detects commit is ongoing", () => {
-    expect(commit.isCommitOnGoing("./.git/COMMIT_EDITMSG")).toBe(true);
+    expect(isCommitOnGoing(DEFAULT_COMMIT_MESSAGE_FILE)).toBe(true);
 
+    jest.spyOn(fs, "readFileSync").mockImplementationOnce(() => {
+      throw new Error("Random error");
+    });
+    expect(isCommitOnGoing(DEFAULT_COMMIT_MESSAGE_FILE)).toBe(false);
+  });
+
+  it("should get current commit message", () => {
+    expect(getCurrentCommitMessage(DEFAULT_COMMIT_MESSAGE_FILE)).toBe(
+      DEFAULT_COMMIT_TITLE,
+    );
+  });
+
+  it("should fail to get current commit message if there is no commit message file", () => {
     jest.spyOn(fs, "readFileSync").mockImplementationOnce(() => {
       throw new Error("Could not find file");
     });
-    expect(commit.isCommitOnGoing("./.git/COMMIT_EDITMSG")).toBe(false);
+
+    expect(() =>
+      getCurrentCommitMessage(DEFAULT_COMMIT_MESSAGE_FILE),
+    ).toThrow();
   });
 
   it("should add co-authors to commit message", () => {
-    let writeFileSpy = jest.fn();
-    jest.spyOn(fs, "writeFileSync").mockImplementation(writeFileSpy);
+    let writeFileSpy = jest.spyOn(fs, "writeFileSync");
+    writeFileSpy.mockImplementation(jest.fn());
 
-    commit.updateCommitMessageWithCoAuthors("./.git/COMMIT_EDITMSG", [
+    updateCommitMessageWithCoAuthors(DEFAULT_COMMIT_MESSAGE_FILE, [
       "Marie Jane <mjane@google.com>",
     ]);
 
     expect(writeFileSpy).toHaveBeenCalledWith(
-      "./.git/COMMIT_EDITMSG",
+      DEFAULT_COMMIT_MESSAGE_FILE,
       `feat: default commit message\n\nCo-authored-by: Marie Jane <mjane@google.com>`,
       "utf8",
     );

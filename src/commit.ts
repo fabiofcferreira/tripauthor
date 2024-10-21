@@ -30,6 +30,7 @@ export function updateCommitMessageWithCoAuthors(
 
     const newCommitPayload =
       currentCommitBody + "\n\n" + coAuthorsLines.join("\n");
+
     writeFileSync(commitMessageFile, newCommitPayload, "utf8");
   } catch (e) {
     throw new Error(
