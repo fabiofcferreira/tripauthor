@@ -24,11 +24,11 @@ commands:
     steps:
       - checkout
       - node/install:
-          install-yarn: true
-          yarn-version: '4.5.1'
       - run:
-          name: Enable corepack
-          command: corepack enable
+          name: Yarn Set Version Stable
+          command: |
+            npm install -g yarn                                                                                           
+            yarn set version stable
       - run:
           name: NPM Auth
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
