@@ -1,5 +1,5 @@
 import { homedir } from "os";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 export const USER_HOME_DIR = homedir();
 
@@ -11,7 +11,10 @@ export type CoAuthor = {
   email: string;
 };
 
-export function loadGitKnownCoAuthors(filePath: string): CoAuthor[] {
+export const isCoAuthorDisplayNameValid = (line: string) =>
+  COAUTHOR_LINE_REGEX.test(line);
+
+export function readGitKnownCoAuthors(filePath: string): CoAuthor[] {
   try {
     const knownAuthors = readFileSync(filePath, "utf8");
     const lines = knownAuthors.split("\n");
@@ -31,6 +34,21 @@ export function loadGitKnownCoAuthors(filePath: string): CoAuthor[] {
     });
 
     return coauthors;
+  } catch (ex) {
+    throw new Error(`Error parsing co-authors from file ${filePath}: ${ex}`);
+  }
+}
+
+export function updateGitKnownCoAuthors(
+  filePath: string,
+  coAuthors: CoAuthor[],
+): boolean {
+  try {
+    const contents = coAuthors
+      .map((coAuthor) => coAuthor.displayName)
+      .join("\n");
+    writeFileSync(filePath, contents, "utf8");
+    return true;
   } catch (ex) {
     throw new Error(`Error parsing co-authors from file ${filePath}: ${ex}`);
   }
