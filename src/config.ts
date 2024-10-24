@@ -45,6 +45,7 @@ export function updateGitKnownCoAuthors(
 ): boolean {
   try {
     const contents = coAuthors
+      .filter((coAuthor) => isCoAuthorDisplayNameValid(coAuthor.displayName))
       .map((coAuthor) => coAuthor.displayName)
       .join("\n");
     writeFileSync(filePath, contents, "utf8");
