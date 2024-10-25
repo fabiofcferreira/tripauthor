@@ -24,7 +24,8 @@ yarn add --dev tripauthor
 git config --local core.hooksPath ~/githooks/
 
 # Copy the tripauthor hooks to the global hooks path
-cp script ~/githooks/
+# Use `yarn` if you've installed tripauthor locally
+echo "exec < /dev/tty && npx tripauthor -f $1` >> ~/githooks/commit-msg
 
 # Set access permissions so that the scripts can be executed by Git
 chmod a+x ~/githooks/*
