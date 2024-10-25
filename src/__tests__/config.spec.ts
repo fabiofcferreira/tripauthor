@@ -16,6 +16,7 @@ const DEFAULT_COAUTHORS_CONFIG_FILE_PATH = `${homedir()}/.git_coauthors`;
 
 describe("Config load", () => {
   it("should read & load only valid coauthors from config file", () => {
+    jest.spyOn(fs, "existsSync").mockReturnValueOnce(true);
     jest
       .spyOn(fs, "readFileSync")
       .mockReturnValueOnce(MOCKED_COAUTHORS_FILE_CONTENT);
@@ -32,9 +33,19 @@ describe("Config load", () => {
     expect(coauthors[1].email).toBe("mjane@google.com");
   });
 
-  it("should fail to load config file if it cannot be found", () => {
+  it("should return empty array if config file cannot be found", () => {
+    jest.spyOn(fs, "existsSync").mockReturnValueOnce(false);
+
+    const knownCoAuthors = readGitKnownCoAuthors(
+      DEFAULT_COAUTHORS_CONFIG_FILE_PATH,
+    );
+    expect(knownCoAuthors).toHaveLength(0);
+  });
+
+  it("should fail if config file cannot be parsed", () => {
+    jest.spyOn(fs, "existsSync").mockReturnValueOnce(true);
     jest.spyOn(fs, "readFileSync").mockImplementation(() => {
-      throw new Error("Random error");
+      throw new Error("Could not read config file");
     });
 
     expect(() =>
@@ -44,7 +55,6 @@ describe("Config load", () => {
 
   it("should write only valid coauthors to config file", () => {
     const writeSpy = jest.spyOn(fs, "writeFileSync");
-
     writeSpy.mockImplementation(jest.fn());
 
     const result = updateGitKnownCoAuthors(DEFAULT_COAUTHORS_CONFIG_FILE_PATH, [

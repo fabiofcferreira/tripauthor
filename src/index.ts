@@ -4,9 +4,9 @@ import yargs from "yargs";
 import chalk from "chalk";
 import { hideBin } from "yargs/helpers";
 import {
-  isCoAuthorDisplayNameValid,
+  addCoauthorToConfig,
+  listConfiguredCoAuthors,
   readGitKnownCoAuthors,
-  updateGitKnownCoAuthors,
   USER_HOME_DIR,
 } from "./config";
 import { getSelectedCoauthors } from "./prompts";
@@ -20,58 +20,29 @@ async function runCoCommitFlow({
   commitFile: string;
   coAuthorsFile: string;
 }) {
-  try {
-    if (!isCommitOnGoing(commitFile)) {
-      console.info(chalk.red("No commit is ongoing"));
-      process.exit(0);
-    }
-
-    const knownCoAuthors = readGitKnownCoAuthors(coAuthorsFile);
-
-    const authorsList = await getSelectedCoauthors(knownCoAuthors);
-    if (!authorsList) {
-      console.info(chalk.green("🧑‍💻 No co-authors selected!"));
-      return;
-    }
-
-    updateCommitMessageWithCoAuthors(commitFile, authorsList);
-    console.info(chalk.green("🚀 Co-authors added to the commit!"));
-  } catch (e) {
-    console.error(chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`));
+  if (!isCommitOnGoing(commitFile)) {
+    console.info(chalk.red("No commit is ongoing"));
+    process.exit(0);
   }
-}
 
-function addCoauthorToConfig({
-  name,
-  email,
-  coAuthorsFile,
-}: {
-  name: string;
-  email: string;
-  coAuthorsFile: string;
-}) {
-  try {
-    const coAuthorDisplayName = `${name} <${email}>`;
-    if (!isCoAuthorDisplayNameValid(coAuthorDisplayName)) {
-      throw new Error(
-        "Invalid co-author configuration. Expected format: 'Name <email>'",
-      );
-    }
-
-    const knownCoAuthors = readGitKnownCoAuthors(coAuthorsFile);
-    knownCoAuthors.push({
-      displayName: coAuthorDisplayName,
-      name,
-      email,
-    });
-
-    updateGitKnownCoAuthors(coAuthorsFile, knownCoAuthors);
-    console.info(chalk.green("✅ Co-author added to the config file!"));
-  } catch (e) {
-    console.error(
-      chalk.red(`🚒 Failed to add co-author to the config file: ${e}`),
+  const knownCoAuthors = readGitKnownCoAuthors(coAuthorsFile);
+  if (!knownCoAuthors.length) {
+    console.info(
+      chalk.yellow(
+        `No co-authors configured in the config file (${coAuthorsFile}!`,
+      ),
     );
+    return;
   }
+
+  const authorsList = await getSelectedCoauthors(knownCoAuthors);
+  if (!authorsList) {
+    console.info(chalk.green("🧑‍💻 No co-authors selected!"));
+    return;
+  }
+
+  updateCommitMessageWithCoAuthors(commitFile, authorsList);
+  console.info(chalk.green("🚀 Co-authors added to the commit!"));
 }
 
 yargs(hideBin(process.argv))
@@ -93,19 +64,24 @@ yargs(hideBin(process.argv))
         default: `${USER_HOME_DIR}/.git_coauthors`,
       },
     },
-    (argv) => {
-      runCoCommitFlow({
-        commitFile: argv.f,
-        coAuthorsFile: argv.coAuthorsFile,
-      });
+    async (argv) => {
+      try {
+        await runCoCommitFlow({
+          commitFile: argv.f,
+          coAuthorsFile: argv.coAuthorsFile,
+        });
+      } catch (e) {
+        console.error(
+          chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`),
+        );
+      }
     },
   )
   .command({
-    command: "add-coauthor",
+    command: "add-coauthor <name> <email>",
     describe: "Add coauthor to the coauthors file",
+    aliases: ["add", "a"],
     builder: {
-      name: { type: "string", demandOption: true },
-      email: { type: "string", demandOption: true },
       coAuthorsFile: {
         alias: "co-authors-file",
         describe: "Co-authors file path",
@@ -114,11 +90,37 @@ yargs(hideBin(process.argv))
       },
     },
     handler: (args) => {
-      addCoauthorToConfig({
-        name: args.name,
-        email: args.email,
-        coAuthorsFile: args.coAuthorsFile,
-      });
+      try {
+        addCoauthorToConfig({
+          name: args.name,
+          email: args.email,
+          coAuthorsFile: args.coAuthorsFile,
+        });
+      } catch (e) {
+        console.error(
+          chalk.red(`🚒 Failed to add co-author to the config file: ${e}`),
+        );
+      }
+    },
+  })
+  .command({
+    command: "list-coauthors",
+    describe: "List all configured coauthors",
+    aliases: ["list", "l"],
+    builder: {
+      coAuthorsFile: {
+        alias: "co-authors-file",
+        describe: "Co-authors file path",
+        type: "string",
+        default: `${USER_HOME_DIR}/.git_coauthors`,
+      },
+    },
+    handler: (args) => {
+      try {
+        listConfiguredCoAuthors(args.coAuthorsFile);
+      } catch (e) {
+        console.error(chalk.red(`🚒 Failed to read the config file: ${e}`));
+      }
     },
   })
   .version(packageBundleJson.version)
