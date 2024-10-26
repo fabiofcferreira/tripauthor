@@ -4,3 +4,10 @@ node_modules/
 # Dist/lib folders
 dist/
 lib/
+
+# Yarn folders
+.yarn
+
+# IDEs
+.idea
+.vscode
