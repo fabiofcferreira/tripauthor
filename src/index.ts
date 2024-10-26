@@ -42,7 +42,6 @@ async function runCoCommitFlow({
   }
 
   updateCommitMessageWithCoAuthors(commitFile, authorsList);
-  console.info(chalk.green("🚀 Co-authors added to the commit!"));
 }
 
 yargs(hideBin(process.argv))
@@ -64,17 +63,19 @@ yargs(hideBin(process.argv))
         default: `${USER_HOME_DIR}/.git_coauthors`,
       },
     },
-    async (argv) => {
-      try {
-        await runCoCommitFlow({
-          commitFile: argv.f,
-          coAuthorsFile: argv.coAuthorsFile,
+    (argv) => {
+      runCoCommitFlow({
+        commitFile: argv.f,
+        coAuthorsFile: argv.coAuthorsFile,
+      })
+        .then(() => {
+          console.info(chalk.green("🚀 Co-authors added to the commit!"));
+        })
+        .catch((e) => {
+          console.error(
+            chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`),
+          );
         });
-      } catch (e) {
-        console.error(
-          chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`),
-        );
-      }
     },
   )
   .command({

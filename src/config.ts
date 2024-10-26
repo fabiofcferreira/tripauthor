@@ -1,19 +1,15 @@
 import { homedir } from "os";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import chalk from "chalk";
+import { isCoAuthorLineValid, parseCoAuthorLine } from "./parse";
 
 export const USER_HOME_DIR = homedir();
-
-const COAUTHOR_LINE_REGEX = new RegExp(/^([\w\sÀ-ž-.]+)\s<([\w.-]+@[\w.]+)>$/);
 
 export type CoAuthor = {
   displayName: string;
   name: string;
   email: string;
 };
-
-export const isCoAuthorDisplayNameValid = (line: string) =>
-  COAUTHOR_LINE_REGEX.test(line);
 
 export function readGitKnownCoAuthors(filePath: string): CoAuthor[] {
   if (!existsSync(filePath)) {
@@ -26,17 +22,16 @@ export function readGitKnownCoAuthors(filePath: string): CoAuthor[] {
     const lines = knownAuthors.split("\n");
 
     const coauthors: CoAuthor[] = [];
-    lines.forEach((displayName) => {
-      const regexResult = displayName.match(COAUTHOR_LINE_REGEX);
-      if (!regexResult || regexResult.length !== 3) {
-        return;
-      }
+    lines.forEach((line) => {
+      try {
+        if (!line.trim().length) {
+          return;
+        }
 
-      coauthors.push({
-        displayName: displayName,
-        name: regexResult[1],
-        email: regexResult[2],
-      });
+        coauthors.push(parseCoAuthorLine(line));
+      } catch (e) {
+        console.info(chalk.red(e));
+      }
     });
 
     return coauthors;
@@ -51,7 +46,7 @@ export function updateGitKnownCoAuthors(
 ): boolean {
   try {
     const contents = coAuthors
-      .filter((coAuthor) => isCoAuthorDisplayNameValid(coAuthor.displayName))
+      .filter((coAuthor) => isCoAuthorLineValid(coAuthor.displayName))
       .map((coAuthor) => coAuthor.displayName)
       .join("\n");
     writeFileSync(filePath, contents, "utf8");
@@ -73,7 +68,7 @@ export function addCoauthorToConfig({
   coAuthorsFile,
 }: AddCoauthorsToConfigParams) {
   const coAuthorDisplayName = `${name} <${email}>`;
-  if (!isCoAuthorDisplayNameValid(coAuthorDisplayName)) {
+  if (!isCoAuthorLineValid(coAuthorDisplayName)) {
     throw new Error(
       "Invalid co-author configuration. Expected format: 'Name <email>'",
     );
