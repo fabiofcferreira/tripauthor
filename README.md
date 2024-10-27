@@ -14,9 +14,9 @@ npm add --save-dev tripauthor
 yarn add --dev tripauthor
 ```
 
-## Usage
+## Configuration
 
-### Global configuration
+### Global hooks
 
 **By doing this, all repositories will use the global hooks even if they have git hooks configured.**
 ```bash
@@ -34,13 +34,26 @@ chmod a+x ~/githooks/*
 ### Husky
 
 ```bash
-echo "yarn tripauthor -f $1" > .husky/commit-msg
-
+echo "exec < /dev/tty && yarn tripauthor -f $1" > .husky/commit-msg
 chmod a+x .husky/commit-msg
 ```
 
-## Add more coauthors
+## Usage
+
+### Set up new co-author
 
 ```bash
-echo "name <email>" >> ~/.git_coauthors
+npx tripauthor add <name> <email>
+
+# alias
+npx tripauthor a <name> <email>
+```
+
+### List configured co-authors
+
+```bash
+npx tripauthor list
+
+# alias
+npx tripauthor l
 ```
