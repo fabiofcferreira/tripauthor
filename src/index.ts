@@ -125,4 +125,4 @@ yargs(hideBin(process.argv))
     },
   })
   .version(packageBundleJson.version)
-  .parseSync();
+  .parseAsync();
