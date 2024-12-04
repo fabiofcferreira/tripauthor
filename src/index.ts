@@ -29,8 +29,8 @@ async function runCoCommitFlow({
   if (!knownCoAuthors.length) {
     console.info(
       chalk.yellow(
-        `No co-authors configured in the config file (${coAuthorsFile}!`,
-      ),
+        `No co-authors configured in the config file (${coAuthorsFile}!`
+      )
     );
     return;
   }
@@ -43,6 +43,14 @@ async function runCoCommitFlow({
 
   updateCommitMessageWithCoAuthors(commitFile, authorsList);
 }
+
+process.on("SIGINT", () => {
+  process.exit(1);
+});
+
+process.on("SIGKILL", () => {
+  process.exit(1);
+});
 
 yargs(hideBin(process.argv))
   .usage("Usage: $0 -f [commit message file]")
@@ -73,10 +81,10 @@ yargs(hideBin(process.argv))
         })
         .catch((e) => {
           console.error(
-            chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`),
+            chalk.red(`🚒 Failed to add co-authors to the commit: ${e}`)
           );
         });
-    },
+    }
   )
   .command({
     command: "add-coauthor <name> <email>",
@@ -99,7 +107,7 @@ yargs(hideBin(process.argv))
         });
       } catch (e) {
         console.error(
-          chalk.red(`🚒 Failed to add co-author to the config file: ${e}`),
+          chalk.red(`🚒 Failed to add co-author to the config file: ${e}`)
         );
       }
     },
